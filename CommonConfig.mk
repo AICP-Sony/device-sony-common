@@ -88,7 +88,7 @@ DONT_DEXPREOPT_PREBUILTS := true
 
 BUILD_KERNEL := true
 -include device/sony/common-headers/KernelHeaders.mk
--include device/sony/common-kernel/KernelConfig.mk
+#-include device/sony/common-kernel/KernelConfig.mk
 
 # Include build helpers for QCOM proprietary
 -include vendor/qcom/proprietary/common/build/proprietary-build.mk
