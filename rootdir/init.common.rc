@@ -196,9 +196,6 @@ on boot
 
     chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
 
-    # Create symlink for fb1 as HDMI
-    symlink /dev/graphics/fb1 /dev/graphics/hdmi
-
     # Graphics Permissions
     chown system graphics /sys/class/graphics/fb0/idle_time
     chmod 0664 /sys/class/graphics/fb0/idle_time
@@ -321,6 +318,28 @@ service irsc_util /system/vendor/bin/irsc_util "/etc/sec_config"
     user root
     oneshot
 
+# QCOM prop
+service per_mgr /system/vendor/bin/pm-service
+    class core
+    user system
+    group system net_raw
+    writepid /dev/cpuset/system-background/tasks
+
+# QCOM prop
+service per_proxy /system/vendor/bin/pm-proxy
+    class core
+    user system
+    group system net_raw
+    disabled
+    writepid /dev/cpuset/system-background/tasks
+
+service msm_irqbalance /system/vendor/bin/msm_irqbalance -f /system/etc/msm_irqbalance.conf
+    socket msm_irqbalance seqpacket 660 root system
+    class core
+    user root
+    group root
+    writepid /dev/cpuset/system-background/tasks
+
 # QCOM sensors
 service sensors /system/vendor/bin/sensors.qcom
     class main
@@ -374,6 +393,12 @@ on property:ro.boot.baseband=msm
 
 on property:persist.radio.multisim.config=dsds
     enable ril-daemon2
+
+on property:init.svc.per_mgr=running
+    start per_proxy
+
+on property:sys.shutdown.requested=*
+    stop per_proxy
 
 # adb over network
 on property:adb.network.port.es=*
